@@ -1,5 +1,6 @@
 package store;
 
+import static store.view.InputView.*;
 import static store.view.OutputView.*;
 
 import java.io.BufferedReader;
@@ -18,6 +19,7 @@ public class Store {
             loadProducts();
             printStoreOpenMessage();
             printProducts(products);
+            readProductAndQuantity();
         } catch (IllegalArgumentException | IOException e) {
             e.getMessage();
         }
