@@ -19,4 +19,9 @@ public class Products {
         }
         return promotion;
     }
+
+    @Override
+    public String toString() {
+        return "- " + name + " " + price + "원 " + quantity + "개 " + promotion;
+    }
 }

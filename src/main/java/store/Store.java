@@ -1,10 +1,11 @@
 package store;
 
+import static store.view.OutputView.*;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import store.value.Products;
 
@@ -15,6 +16,8 @@ public class Store {
     public void open() {
         try {
             loadProducts();
+            printStoreOpenMessage();
+            printProducts(products);
         } catch (IllegalArgumentException | IOException e) {
             e.getMessage();
         }
@@ -37,7 +40,6 @@ public class Store {
 
         // 첫 줄은 제외하고 저장하기 위해 인덱스 0번째 값이 "name"이 아닌 배열만 사용
         if (!product[0].equals("name")) {
-            System.out.println(Arrays.toString(product));
             products.add(new Products(product[0], Integer.parseInt(product[1])
                     , Integer.parseInt(product[2]), product[3]));
         }
