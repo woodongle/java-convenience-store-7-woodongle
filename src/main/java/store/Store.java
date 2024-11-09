@@ -1,5 +1,6 @@
 package store;
 
+import static store.validation.Validation.*;
 import static store.view.InputView.*;
 import static store.view.OutputView.*;
 
@@ -12,16 +13,43 @@ import store.value.Products;
 
 public class Store {
 
-    private final List<Products> products = new ArrayList<>();
+    private final List<Products> stock = new ArrayList<>();
+    private final List<String[]> product = new ArrayList<>();
 
     public void open() {
         try {
             loadProducts();
             printStoreOpenMessage();
-            printProducts(products);
-            readProductAndQuantity();
-        } catch (IllegalArgumentException | IOException e) {
-            e.getMessage();
+            printProducts(stock);
+            openForBusiness();
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    // 구매할 상품과 개수를 저장하는 메서드
+    private void saveProductAndQuantity(String replaceInput) {
+        String[] split = replaceInput.split("-");
+        product.add(split);
+    }
+
+    // 편의점 영업 프로세스 메서드
+    private void openForBusiness() {
+        selectProductAndQuantity();
+    }
+
+    // 구매할 상품과 개수를 입력 받아 검증한 후 저장하는 메서드
+    private void selectProductAndQuantity() {
+        try {
+            List<String> productAndQuantity = readProductAndQuantity();
+
+            for (String string : productAndQuantity) {
+                saveProductAndQuantity(confirmInputFormat(string)
+                        .replace("[", "").replace("]", ""));
+            }
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            selectProductAndQuantity();
         }
     }
 
@@ -38,11 +66,11 @@ public class Store {
     }
 
     // products.md 파일에서 가져온 상품을 저장하는 메서드
-    public void saveProducts(String[] product) {
+    private void saveProducts(String[] product) {
 
         // 첫 줄은 제외하고 저장하기 위해 인덱스 0번째 값이 "name"이 아닌 배열만 사용
         if (!product[0].equals("name")) {
-            products.add(new Products(product[0], Integer.parseInt(product[1])
+            stock.add(new Products(product[0], Integer.parseInt(product[1])
                     , Integer.parseInt(product[2]), product[3]));
         }
     }
