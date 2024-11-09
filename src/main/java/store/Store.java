@@ -36,7 +36,8 @@ public class Store {
     private void saveProductAndQuantity(String replaceInput) {
         List<String> split = List.of(replaceInput.split("-"));
 
-        purchaseProductAndQuantity.add(confirmProductExists(stock, split));
+        purchaseProductAndQuantity.add(
+                confirmStockQuantityExceeded(stock, confirmProductExists(stock, split)));
     }
 
     // 구매할 상품과 개수를 입력 받아 형식이 맞는지 검증한 후 저장하는 메서드
