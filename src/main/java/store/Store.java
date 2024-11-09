@@ -14,7 +14,7 @@ import store.value.Products;
 public class Store {
 
     private final List<Products> stock = new ArrayList<>();
-    private final List<String[]> product = new ArrayList<>();
+    private final List<List<String>> purchaseProductAndQuantity = new ArrayList<>();
 
     public void open() {
         try {
