@@ -1,6 +1,7 @@
 package store;
 
 import static store.imports.ImportProducts.loadProducts;
+import static store.imports.ImportPromotions.loadPromotions;
 import static store.validation.Validation.*;
 import static store.view.InputView.*;
 import static store.view.OutputView.*;
@@ -9,15 +10,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import store.value.Products;
+import store.value.Promotions;
 
 public class Store {
 
     private final List<Products> stock = new ArrayList<>();
+    private final List<Promotions> promotions = new ArrayList<>();
     private final List<List<String>> purchaseProductAndQuantity = new ArrayList<>();
 
     public void open() {
         try {
             loadProducts(stock);
+            loadPromotions(promotions);
             printStoreOpenMessage();
             printProducts(stock);
             openForBusiness();
