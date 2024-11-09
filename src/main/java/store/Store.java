@@ -27,15 +27,16 @@ public class Store {
         }
     }
 
-    // 구매할 상품과 개수를 저장하는 메서드
-    private void saveProductAndQuantity(String replaceInput) {
-        String[] split = replaceInput.split("-");
-        product.add(split);
-    }
-
     // 편의점 영업 프로세스 메서드
     private void openForBusiness() {
         selectProductAndQuantity();
+    }
+
+    // 구매할 상품이 존재하는지 검증한 후 상품과 개수를 저장하는 메서드
+    private void saveProductAndQuantity(String replaceInput) {
+        List<String> split = List.of(replaceInput.split("-"));
+
+        purchaseProductAndQuantity.add(confirmProductExists(stock, split));
     }
 
     // 구매할 상품과 개수를 입력 받아 검증한 후 저장하는 메서드

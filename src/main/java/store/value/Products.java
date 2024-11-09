@@ -1,5 +1,7 @@
 package store.value;
 
+import java.util.List;
+
 public class Products {
     private String name;
     private int price;
@@ -23,5 +25,15 @@ public class Products {
     @Override
     public String toString() {
         return "- " + name + " " + price + "원 " + quantity + "개 " + promotion;
+    }
+
+    public static boolean isProductExists(List<Products> stock, List<String> split) {
+        for (Products products : stock) {
+            if (products.name.equals(split.getFirst())) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
