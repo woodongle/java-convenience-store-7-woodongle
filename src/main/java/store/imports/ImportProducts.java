@@ -21,14 +21,12 @@ public class ImportProducts {
     }
 
     // products.md 파일에서 가져온 상품을 저장하는 메서드
-    public static List<Products> saveProducts(List<Products> stock, String[] product) {
+    public static void saveProducts(List<Products> stock, String[] product) {
 
         // 첫 줄은 제외하고 저장하기 위해 인덱스 0번째 값이 "name"이 아닌 배열만 사용
         if (!product[0].equals("name")) {
             stock.add(new Products(product[0], Integer.parseInt(product[1])
                     , Integer.parseInt(product[2]), product[3]));
         }
-
-        return stock;
     }
 }
