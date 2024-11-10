@@ -45,11 +45,11 @@ public class Products {
 
     // 사용자가 구매할 상품의 프로모션 정보를 찾는 메서드
     private static Promotions findPromotion(Products product, List<Promotions> promotions, List<String> purchase) {
-        for (Promotions promo : promotions) {
-            if (promo.getName().equals(product.promotion) &&
+        for (Promotions promotion : promotions) {
+            if (promotion.getName().equals(product.promotion) &&
                     isPromotionExists(product) &&
                     product.name.equals(purchase.getFirst())) {
-                return promo;
+                return promotion;
             }
         }
         return null;
