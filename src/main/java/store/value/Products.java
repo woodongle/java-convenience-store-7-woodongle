@@ -3,6 +3,8 @@ package store.value;
 import static store.validation.Validation.confirmYOrN;
 import static store.view.InputView.readPromotionYOrN;
 
+import camp.nextstep.edu.missionutils.DateTimes;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,12 +62,21 @@ public class Products {
         return null;
     }
 
+    // 사용자가 구매할 상품이 프로모션 할인 기간인지 확인하는 메서드
+    public static boolean isCurrentDateInRange(LocalDate startDate, LocalDate endDate) {
+        LocalDate currentDate = LocalDate.from(DateTimes.now());
+        System.out.println(!currentDate.isBefore(startDate) && !currentDate.isAfter(endDate));
+        
+        return !currentDate.isBefore(startDate) && !currentDate.isAfter(endDate);
+    }
+
     // 사용자가 구매할 상품이 프로모션 적용이 되는 상품인지 확인하는 메서드
     private static boolean isEligibleForPromotion(Products product, List<String> purchase, Promotions promotion) {
         return isPromotionExists(product) &&
                 product.name.equals(purchase.getFirst()) &&
                 Integer.parseInt(purchase.getLast()) == promotion.getBuy() &&
-                Integer.parseInt(purchase.getLast()) < product.quantity;
+                Integer.parseInt(purchase.getLast()) < product.quantity &&
+                isCurrentDateInRange(promotion.getStartDate(), promotion.getEndDate());
     }
 
     // 사용자가 입력한 값에 따라 프로모션 적용 유무를 결정하는 메서드
