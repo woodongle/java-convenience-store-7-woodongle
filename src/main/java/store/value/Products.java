@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Products {
+    public static int NUMBER_OF_ADDITIONAL_GIFTS = 1;
+
     private String name;
     private int price;
     private int quantity;
@@ -65,7 +67,7 @@ public class Products {
     // 사용자가 입력한 값에 따라 프로모션 적용 유무를 결정하는 메서드
     private static void processPromotion(Products product, List<String> purchase) {
         if (confirmYOrN(readPromotionYOrN(product.name)).equalsIgnoreCase("Y")) {
-            int newQuantity = Integer.parseInt(purchase.getLast()) + 1;
+            int newQuantity = Integer.parseInt(purchase.getLast()) + NUMBER_OF_ADDITIONAL_GIFTS;
             purchase.set(1, String.valueOf(newQuantity));
         }
     }
