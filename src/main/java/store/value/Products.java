@@ -64,7 +64,8 @@ public class Products {
     private static boolean isEligibleForPromotion(Products product, List<String> purchase, Promotions promotion) {
         return isPromotionExists(product) &&
                 product.name.equals(purchase.getFirst()) &&
-                Integer.parseInt(purchase.getLast()) == promotion.getBuy();
+                Integer.parseInt(purchase.getLast()) == promotion.getBuy() &&
+                Integer.parseInt(purchase.getLast()) < product.quantity;
     }
 
     // 사용자가 입력한 값에 따라 프로모션 적용 유무를 결정하는 메서드
