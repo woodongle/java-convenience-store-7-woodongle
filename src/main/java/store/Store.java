@@ -3,6 +3,7 @@ package store;
 import static store.imports.ImportProducts.loadProducts;
 import static store.imports.ImportPromotions.loadPromotions;
 import static store.validation.Validation.*;
+import static store.value.Products.*;
 import static store.view.InputView.*;
 import static store.view.OutputView.*;
 
@@ -33,6 +34,34 @@ public class Store {
     // 편의점 영업 프로세스 메서드
     private void openForBusiness() {
         selectProductAndQuantity();
+        applyPromotionsProcess();
+        deductedQuantityProcess();
+    }
+
+    // 프로모션 적용 프로세스 메서드
+    private void applyPromotionsProcess() {
+        try {
+            List<List<String>> updatedPurchases = new ArrayList<>();
+            for (List<String> purchase : purchaseProductAndQuantity) {
+                List<String> updatedPurchase = purchase;
+                for (Products products : stock) {
+                    updatedPurchase = applyPromotions(updatedPurchase, products, promotions);
+                }
+                updatedPurchases.add(updatedPurchase);
+            }
+            purchaseProductAndQuantity.clear();
+            purchaseProductAndQuantity.addAll(updatedPurchases);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            applyPromotionsProcess();
+        }
+    }
+
+    // 상품 개수 차감 프로세스 메서드
+    private void deductedQuantityProcess() {
+        for (List<String> purchase : purchaseProductAndQuantity) {
+            deductedQuantity(stock, purchase);
+        }
     }
 
     // 구매할 상품이 존재하는지 검증한 후 상품과 개수를 저장하는 메서드
