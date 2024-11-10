@@ -23,6 +23,10 @@ public class Products {
         this.promotion = confirmNullPromotion(promotion);
     }
 
+    public String getName() {
+        return name;
+    }
+
     private String confirmNullPromotion(String promotion) {
         if (promotion.equals("null")) {
             promotion = "";
@@ -44,7 +48,7 @@ public class Products {
         Promotions applicablePromotion = findPromotion(product, promotions, updatedPurchase);
 
         if (applicablePromotion != null && isEligibleForPromotion(product, updatedPurchase, applicablePromotion)) {
-            processPromotion(product, updatedPurchase);
+            processPromotion(product, updatedPurchase, applicablePromotion);
         }
 
         return updatedPurchase;
@@ -65,8 +69,7 @@ public class Products {
     // 사용자가 구매할 상품이 프로모션 할인 기간인지 확인하는 메서드
     public static boolean isCurrentDateInRange(LocalDate startDate, LocalDate endDate) {
         LocalDate currentDate = LocalDate.from(DateTimes.now());
-        System.out.println(!currentDate.isBefore(startDate) && !currentDate.isAfter(endDate));
-        
+
         return !currentDate.isBefore(startDate) && !currentDate.isAfter(endDate);
     }
 
@@ -74,47 +77,45 @@ public class Products {
     private static boolean isEligibleForPromotion(Products product, List<String> purchase, Promotions promotion) {
         return isPromotionExists(product) &&
                 product.name.equals(purchase.getFirst()) &&
-                Integer.parseInt(purchase.getLast()) == promotion.getBuy() &&
-                Integer.parseInt(purchase.getLast()) < product.quantity &&
+                Integer.parseInt(purchase.getLast()) >= promotion.getBuy() &&
+                Integer.parseInt(purchase.getLast()) <= product.quantity &&
                 isCurrentDateInRange(promotion.getStartDate(), promotion.getEndDate());
     }
 
     // 사용자가 입력한 값에 따라 프로모션 적용 유무를 결정하는 메서드
-    private static void processPromotion(Products product, List<String> purchase) {
-        if (confirmYOrN(readPromotionYOrN(product.name)).equalsIgnoreCase("Y")) {
-            int newQuantity = Integer.parseInt(purchase.getLast()) + NUMBER_OF_ADDITIONAL_GIFTS;
-            purchase.set(1, String.valueOf(newQuantity));
+    private static void processPromotion(Products product, List<String> purchase, Promotions promotion) {
+        int purchaseQuantity = Integer.parseInt(purchase.getLast());
+        int freeItems = 0;
+        int buyCount = promotion.getBuy();
+
+        int promotionApplicableCount = purchaseQuantity / (buyCount + 1);
+        int remainder = purchaseQuantity % (buyCount + 1);
+
+        freeItems = promotionApplicableCount;
+
+        boolean isPromotionApplicable = (remainder == buyCount);
+        if (isPromotionApplicable) {
+            String userInput = confirmYOrN(readPromotionYOrN(product.name));
+            boolean userAcceptsPromotion = userInput.equalsIgnoreCase("Y");
+            if (userAcceptsPromotion) {
+                freeItems += 1;
+            }
         }
+
+        purchaseQuantity += freeItems;
+        purchase.set(1, String.valueOf(purchaseQuantity));
     }
 
     // 구매하려는 상품의 개수를 재고에 맞게 차감하는 메서드
     public static void deductedQuantity(List<Products> stock, List<String> purchase) {
         int purchaseQuantity = Integer.parseInt(purchase.getLast());
-        int remainPurchaseQuantity = 0;
 
         for (Products products : stock) {
-            if (isPromotionExists(products) && products.name.equals(purchase.getFirst())) {
-                remainPurchaseQuantity = purchaseQuantity - deduct(products, purchaseQuantity);
-                products.quantity -= deduct(products, purchaseQuantity);
+            if (products.name.equals(purchase.getFirst())) {
+                products.quantity -= purchaseQuantity;
+                break;
             }
-
-            if (!isPromotionExists(products) && products.name.equals(purchase.getFirst())) {
-                products.quantity -= remainPurchaseQuantity;
-            }
-
-            System.out.println(products.quantity);
         }
-    }
-
-    // 구매하려는 상품의 개수를 재고에 맞게 조절하는 메서드
-    private static int deduct(Products product, int purchaseQuantity) {
-        int deductedQuantity = purchaseQuantity;
-
-        while (product.quantity < deductedQuantity) {
-            deductedQuantity--;
-        }
-
-        return deductedQuantity;
     }
 
     private static boolean isPromotionExists(Products products) {

@@ -40,21 +40,21 @@ public class Store {
 
     // 프로모션 적용 프로세스 메서드
     private void applyPromotionsProcess() {
-        try {
-            List<List<String>> updatedPurchases = new ArrayList<>();
-            for (List<String> purchase : purchaseProductAndQuantity) {
-                List<String> updatedPurchase = purchase;
-                for (Products products : stock) {
-                    updatedPurchase = applyPromotions(updatedPurchase, products, promotions);
+        List<List<String>> updatedPurchases = new ArrayList<>();
+        for (List<String> purchase : purchaseProductAndQuantity) {
+            List<String> updatedPurchase = new ArrayList<>(purchase);
+            String productName = purchase.get(0);
+
+            for (Products product : stock) {
+                if (product.getName().equals(productName)) {
+                    updatedPurchase = applyPromotions(updatedPurchase, product, promotions);
+                    break;
                 }
-                updatedPurchases.add(updatedPurchase);
             }
-            purchaseProductAndQuantity.clear();
-            purchaseProductAndQuantity.addAll(updatedPurchases);
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-            applyPromotionsProcess();
+            updatedPurchases.add(updatedPurchase);
         }
+        purchaseProductAndQuantity.clear();
+        purchaseProductAndQuantity.addAll(updatedPurchases);
     }
 
     // 상품 개수 차감 프로세스 메서드
