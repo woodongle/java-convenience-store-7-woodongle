@@ -7,6 +7,14 @@ import store.value.Products;
 
 public class Validation {
 
+    public static String confirmYOrN(String input) {
+        if (!input.matches("^[yYnN]$")) {
+            throw new IllegalArgumentException("[ERROR] 잘못된 입력입니다. 다시 입력해 주세요.");
+        }
+
+        return input;
+    }
+
     public static List<String> confirmStockQuantityExceeded(List<Products> stock, List<String> split) {
         if (!isStockQuantityExceeded(stock, split)) {
             throw new IllegalArgumentException("[ERROR] 재고 수량을 초과하여 구매할 수 없습니다. 다시 입력해 주세요.");
