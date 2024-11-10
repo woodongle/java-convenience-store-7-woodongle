@@ -30,7 +30,10 @@ public class Products {
 
     @Override
     public String toString() {
-        return "- " + name + " " + price + "원 " + quantity + "개 " + promotion;
+        if (quantity == 0) {
+            return "- " + name + " " + String.format("%,d", price) + "원 " + "재고 없음";
+        }
+        return "- " + name + " " + String.format("%,d", price) + "원 " + quantity + "개 " + promotion;
     }
 
     // 프로모션을 적용하는 메서드
