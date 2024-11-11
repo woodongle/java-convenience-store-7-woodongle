@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Products {
-    public static int NUMBER_OF_ADDITIONAL_GIFTS = 1;
-
     private String name;
     private int price;
     private int quantity;
