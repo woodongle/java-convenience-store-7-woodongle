@@ -51,9 +51,36 @@ public class Store {
         int freeItemCount = calculateTotalFreeItems();
 
         // 최종 결제 금액 계산
-        int finalAmount = Products.calculateFinalAmount(purchasedProducts, freeItemCount);
+        int totalPurchaseAmount = Products.calculateTotalPurchaseAmount(purchasedProducts);
+        int promotionDiscountAmount = Products.calculatePromotionDiscountAmount(purchasedProducts, freeItemCount);
 
-        System.out.println("최종 결제 금액: " + finalAmount + "원");
+        // 멤버십 할인 여부 확인 (한 번만 물어봄)
+        boolean applyMembershipDiscount = askForMembershipDiscount();
+        int membershipDiscountAmount = 0;
+        if (applyMembershipDiscount) {
+            membershipDiscountAmount = calculateMembershipDiscountAmount(totalPurchaseAmount, promotionDiscountAmount);
+        }
+
+        int finalAmount = totalPurchaseAmount - promotionDiscountAmount - membershipDiscountAmount;
+        System.out.println(finalAmount);
+    }
+
+    private boolean askForMembershipDiscount() {
+        String userInput = confirmYOrN(readMembershipYOrN());
+        return userInput.equalsIgnoreCase("Y");
+    }
+
+    private int calculateMembershipDiscountAmount(int totalPurchaseAmount, int promotionDiscountAmount) {
+        int nonPromotionTotal = totalPurchaseAmount - promotionDiscountAmount;
+        return (int)(nonPromotionTotal * 0.3); // 30% 멤버십 할인
+    }
+
+    private int calculateTotalQuantity(List<Products> purchasedProducts) {
+        int totalQuantity = 0;
+        for (Products product : purchasedProducts) {
+            totalQuantity += product.getQuantity();
+        }
+        return totalQuantity;
     }
 
 

@@ -24,6 +24,10 @@ public class Products {
         this.promotion = confirmNullPromotion(promotion);
     }
 
+    public int getQuantity() {
+        return quantity;
+    }
+
     public int getPrice() {
         return price;
     }
@@ -58,12 +62,10 @@ public class Products {
     public static int calculateFinalAmount(List<Products> purchasedProducts, int freeItemCount) {
         int totalPurchaseAmount = calculateTotalPurchaseAmount(purchasedProducts);
         int promotionDiscountAmount = calculatePromotionDiscountAmount(purchasedProducts, freeItemCount);
-        int membershipDiscountAmount = calculateMembershipDiscountAmount(purchasedProducts, promotionDiscountAmount);
-
-        return totalPurchaseAmount - promotionDiscountAmount - membershipDiscountAmount;
+        return totalPurchaseAmount - promotionDiscountAmount;
     }
 
-    private static int calculateTotalPurchaseAmount(List<Products> purchasedProducts) {
+    public static int calculateTotalPurchaseAmount(List<Products> purchasedProducts) {
         int totalAmount = 0;
 
         for (Products product : purchasedProducts) {
@@ -72,7 +74,7 @@ public class Products {
         return totalAmount;
     }
 
-    private static int calculatePromotionDiscountAmount(List<Products> purchasedProducts, int freeItemCount) {
+    public static int calculatePromotionDiscountAmount(List<Products> purchasedProducts, int freeItemCount) {
         int promotionDiscountAmount = 0;
 
         for (Products product : purchasedProducts) {
@@ -85,7 +87,7 @@ public class Products {
         return promotionDiscountAmount;
     }
 
-    private static int calculateFreeItemsForProduct(Products product) {
+    public static int calculateFreeItemsForProduct(Products product) {
         Promotions promotion = findPromotionByName(product.promotion);
         if (promotion == null) {
             return 0; // 프로모션이 없으면 무료 아이템 없음
@@ -98,22 +100,6 @@ public class Products {
         }
 
         return 0; // 다른 프로모션은 없음
-    }
-
-    private static int calculateMembershipDiscountAmount(List<Products> purchasedProducts, int promotionDiscountAmount) {
-        int totalPurchaseAmount = calculateTotalPurchaseAmount(purchasedProducts);
-
-        // 프로모션이 적용되지 않은 총 구매액
-        int nonPromotionTotal = totalPurchaseAmount - promotionDiscountAmount;
-
-        // 사용자에게 멤버십 할인 여부를 묻기
-        String userInput = confirmYOrN(readMembershipYOrN());
-
-        if (userInput.equalsIgnoreCase("Y")) {
-            return (int)(nonPromotionTotal * MEMBERSHIP_DISCOUNT_RATE); // 멤버십 할인 적용
-        }
-
-        return 0; // 멤버십 할인이 적용되지 않음
     }
 
     private static boolean isTwoPlusOnePromotion(Promotions promotion) {
