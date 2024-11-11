@@ -21,14 +21,19 @@ public class Store {
 
     public void open() {
         try {
-            loadProducts(stock);
-            loadPromotions(promotions);
-            printStoreOpenMessage();
-            printProducts(stock);
+            initializeStore();
             openForBusiness();
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
+    }
+
+    // 편의점 재고를 추가하고 영업을 개시하는 메서드
+    private void initializeStore() throws IOException {
+        loadProducts(stock);
+        loadPromotions(promotions);
+        printStoreOpenMessage();
+        printProducts(stock);
     }
 
     // 편의점 영업 프로세스 메서드
@@ -36,25 +41,107 @@ public class Store {
         selectProductAndQuantity();
         applyPromotionsProcess();
         deductedQuantityProcess();
+        calculateAndDisplayFinalAmount();
     }
 
     // 프로모션 적용 프로세스 메서드
-    private void applyPromotionsProcess() {
-        List<List<String>> updatedPurchases = new ArrayList<>();
-        for (List<String> purchase : purchaseProductAndQuantity) {
-            List<String> updatedPurchase = new ArrayList<>(purchase);
-            String productName = purchase.get(0);
+    private void calculateAndDisplayFinalAmount() {
+        List<Products> purchasedProducts = getPurchasedProducts();
+        int freeItemCount = calculateTotalFreeItems();
+        int finalAmount = calculateFinalAmount(purchasedProducts, freeItemCount);
+        System.out.println(finalAmount);
+    }
 
-            for (Products product : stock) {
-                if (product.getName().equals(productName)) {
-                    updatedPurchase = applyPromotions(updatedPurchase, product, promotions);
-                    break;
-                }
-            }
-            updatedPurchases.add(updatedPurchase);
+    // 구매한 상품 목록을 생성하는 메서드
+    private List<Products> getPurchasedProducts() {
+        List<Products> purchasedProducts = new ArrayList<>();
+        for (List<String> purchase : purchaseProductAndQuantity) {
+            addPurchasedProduct(purchasedProducts, purchase);
         }
-        purchaseProductAndQuantity.clear();
-        purchaseProductAndQuantity.addAll(updatedPurchases);
+        return purchasedProducts;
+    }
+
+    // 구매한 상품을 목록에 추가하는 메서드
+    private void addPurchasedProduct(List<Products> purchasedProducts, List<String> purchase) {
+        String productName = purchase.getFirst();
+        int quantity = Integer.parseInt(purchase.getLast());
+        Products product = findProductByName(productName);
+        if (product != null) {
+            purchasedProducts.add(new Products(product.getName(), product.getPrice(), quantity, product.getPromotion()));
+        }
+    }
+
+    // 구매할 상품을 찾는 메서드
+    private Products findProductByName(String name) {
+        for (Products product : stock) {
+            if (product.getName().equals(name)) {
+                return product;
+            }
+        }
+        return null;
+    }
+
+    // 무료 아이템 개수를 계산하는 메서드
+    private int calculateTotalFreeItems() {
+        int totalFreeItems = 0;
+        for (List<String> purchase : purchaseProductAndQuantity) {
+            totalFreeItems += calculateFreeItemsForPurchase(purchase);
+        }
+        return totalFreeItems;
+    }
+
+    // 각 구매에 대한 무료 아이템 수를 계산하는 메서드
+    private int calculateFreeItemsForPurchase(List<String> purchase) {
+        Products product = findProductByName(purchase.getFirst());
+        if (product == null || product.getPromotion().isEmpty()) {
+            return 0;
+        }
+        Promotions promotion = findPromotionByName(product.getPromotion());
+        if (promotion == null) {
+            return 0;
+        }
+        int purchasedQuantity = Integer.parseInt(purchase.getLast());
+        return calculateFreeItems(purchasedQuantity, promotion.getBuy());
+    }
+
+    // 구매 수량과 프로모션 조건에 따라 무료 아이템 수를 계산하는 메서드
+    private int calculateFreeItems(int purchaseQuantity, int buyCount) {
+        return purchaseQuantity / (buyCount + 1);
+    }
+
+    // 구매할 상품의 프로모션을 찾는 메서드
+    private Promotions findPromotionByName(String name) {
+        for (Promotions promotion : promotions) {
+            if (promotion.getName().equals(name)) {
+                return promotion;
+            }
+        }
+        return null;
+    }
+
+    // 구매한 상품에 프로모션을 적용하는 프로세스
+    private void applyPromotionsProcess() {
+        try {
+            List<List<String>> updatedPurchases = new ArrayList<>();
+            for (List<String> purchase : purchaseProductAndQuantity) {
+                updatedPurchases.add(applyPromotionToPurchase(purchase));
+            }
+            purchaseProductAndQuantity.clear();
+            purchaseProductAndQuantity.addAll(updatedPurchases);
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            applyPromotionsProcess();
+        }
+    }
+
+    // 구매할 상품과 수량을 처리하는 메서드
+    private List<String> applyPromotionToPurchase(List<String> purchase) {
+        String productName = purchase.getFirst();
+        Products product = findProductByName(productName);
+        if (product == null) {
+            return purchase;
+        }
+        return applyPromotions(new ArrayList<>(purchase), product, promotions);
     }
 
     // 상품 개수 차감 프로세스 메서드
@@ -67,23 +154,25 @@ public class Store {
     // 구매할 상품이 존재하는지 검증한 후 상품과 개수를 저장하는 메서드
     private void saveProductAndQuantity(String replaceInput) {
         List<String> split = List.of(replaceInput.split("-"));
-
-        purchaseProductAndQuantity.add(
-                confirmStockQuantityExceeded(stock, confirmProductExists(stock, split)));
+        List<String> confirmedPurchase = confirmStockQuantityExceeded(stock, confirmProductExists(stock, split));
+        purchaseProductAndQuantity.add(confirmedPurchase);
     }
 
     // 구매할 상품과 개수를 입력 받아 형식이 맞는지 검증한 후 저장하는 메서드
     private void selectProductAndQuantity() {
         try {
             List<String> productAndQuantity = readProductAndQuantity();
-
-            for (String string : productAndQuantity) {
-                saveProductAndQuantity(confirmInputFormat(string)
-                        .replace("[", "").replace("]", ""));
-            }
+            processProductAndQuantity(productAndQuantity);
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
             selectProductAndQuantity();
+        }
+    }
+
+    private void processProductAndQuantity(List<String> productAndQuantity) {
+        for (String string : productAndQuantity) {
+            String formattedInput = confirmInputFormat(string).replace("[", "").replace("]", "");
+            saveProductAndQuantity(formattedInput);
         }
     }
 }

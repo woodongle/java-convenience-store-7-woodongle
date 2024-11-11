@@ -1,7 +1,7 @@
 package store.value;
 
 import static store.validation.Validation.confirmYOrN;
-import static store.view.InputView.readPromotionYOrN;
+import static store.view.InputView.*;
 
 import camp.nextstep.edu.missionutils.DateTimes;
 import java.time.LocalDate;
@@ -23,6 +23,14 @@ public class Products {
         this.promotion = confirmNullPromotion(promotion);
     }
 
+    public int getPrice() {
+        return price;
+    }
+
+    public String getPromotion() {
+        return promotion;
+    }
+
     public String getName() {
         return name;
     }
@@ -42,6 +50,33 @@ public class Products {
         return "- " + name + " " + String.format("%,d", price) + "원 " + quantity + "개 " + promotion;
     }
 
+    public static int calculateFinalAmount(List<Products> purchasedProducts, int freeItemCount) {
+        int totalPurchaseAmount = calculateTotalPurchaseAmount(purchasedProducts);
+        int promotionDiscountAmount = calculatePromotionDiscountAmount(purchasedProducts, freeItemCount);
+
+        return totalPurchaseAmount - promotionDiscountAmount;
+    }
+
+    private static int calculateTotalPurchaseAmount(List<Products> purchasedProducts) {
+        int totalAmount = 0;
+
+        for (Products product : purchasedProducts) {
+            totalAmount += product.price * product.quantity;
+        }
+        return totalAmount;
+    }
+
+    private static int calculatePromotionDiscountAmount(List<Products> purchasedProducts, int freeItemCount) {
+        int promotionDiscountAmount = 0;
+
+        for (Products product : purchasedProducts) {
+            if (!product.promotion.isEmpty()) {
+                promotionDiscountAmount += product.price * freeItemCount;
+            }
+        }
+        return promotionDiscountAmount;
+    }
+
     // 프로모션을 적용하는 메서드
     public static List<String> applyPromotions(List<String> purchase, Products product, List<Promotions> promotions) {
         List<String> updatedPurchase = new ArrayList<>(purchase);
@@ -50,7 +85,6 @@ public class Products {
         if (applicablePromotion != null && isEligibleForPromotion(product, updatedPurchase, applicablePromotion)) {
             processPromotion(product, updatedPurchase, applicablePromotion);
         }
-
         return updatedPurchase;
     }
 
@@ -58,11 +92,11 @@ public class Products {
     private static Promotions findPromotion(Products product, List<Promotions> promotions, List<String> purchase) {
         for (Promotions promotion : promotions) {
             if (promotion.getName().equals(product.promotion) &&
-                    isPromotionExists(product) &&
-                    product.name.equals(purchase.getFirst())) {
+                    isPromotionExists(product) && product.name.equals(purchase.getFirst())) {
                 return promotion;
             }
         }
+
         return null;
     }
 
