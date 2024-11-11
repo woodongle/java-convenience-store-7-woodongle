@@ -39,10 +39,20 @@ public class Store {
 
     // 편의점 영업 프로세스 메서드
     private void openForBusiness() {
-        selectProductAndQuantity();
-        applyPromotionsProcess();
-        deductedQuantityProcess();
-        calculateAndDisplayFinalAmount();
+        boolean continueShopping = true;
+
+        while (continueShopping) {
+            printStoreOpenMessage();
+            printProducts(stock);
+            selectProductAndQuantity();
+            applyPromotionsProcess();
+            deductedQuantityProcess();
+            calculateAndDisplayFinalAmount();
+
+            // 추가 구매 여부 확인
+            String userInput = confirmYOrN(printRepurchase());
+            continueShopping = userInput.equalsIgnoreCase("Y");
+        }
     }
 
     // 프로모션 적용 프로세스 메서드
