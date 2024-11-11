@@ -62,7 +62,12 @@ public class Store {
         }
 
         int finalAmount = totalPurchaseAmount - promotionDiscountAmount - membershipDiscountAmount;
-        System.out.println(finalAmount);
+
+        // 총 구매한 상품 수 계산
+        int totalQuantity = calculateTotalQuantity(purchasedProducts);
+
+        // 구매 요약 출력
+        printPurchaseSummary(totalQuantity, purchasedProducts, freeItemCount, totalPurchaseAmount, promotionDiscountAmount, membershipDiscountAmount, finalAmount);
     }
 
     private boolean askForMembershipDiscount() {

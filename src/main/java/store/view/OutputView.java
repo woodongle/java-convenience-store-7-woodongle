@@ -18,4 +18,28 @@ public class OutputView {
             System.out.println(product);
         }
     }
+
+    // 구매 내역을 출력하는 메서드
+    public static void printPurchaseSummary(int totalQuantity, List<Products> purchasedProducts, int freeItemCount, int totalPurchaseAmount, int promotionDiscountAmount, int membershipDiscountAmount, int finalAmount) {
+        System.out.println("==============W 편의점================");
+        System.out.println("상품명\t\t수량\t금액");
+
+        for (Products product : purchasedProducts) {
+            System.out.printf("%s\t\t%d\t%,d\n", product.getName(), product.getQuantity(), product.getPrice() * product.getQuantity());
+        }
+
+        System.out.println("=============증정===============");
+        for (Products product : purchasedProducts) {
+            int freeItems = freeItemCount; // Store에서 계산된 무료 아이템 수를 사용
+            if (freeItems > 0) {
+                System.out.printf("%s\t\t%d\n", product.getName(), freeItems);
+            }
+        }
+
+        System.out.println("====================================");
+        System.out.printf("총구매액\t\t%d\t%,d\n", totalQuantity, totalPurchaseAmount);
+        System.out.printf("행사할인\t\t-%d\n", promotionDiscountAmount);
+        System.out.printf("멤버십할인\t\t-%d\n", membershipDiscountAmount);
+        System.out.printf("내실돈\t\t\t%,d\n", finalAmount);
+    }
 }
