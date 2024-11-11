@@ -89,13 +89,14 @@ public class Products {
 
     public static int calculateFreeItemsForProduct(Products product) {
         Promotions promotion = findPromotionByName(product.promotion);
-        if (promotion == null) {
-            return 0; // 프로모션이 없으면 무료 아이템 없음
+        if (promotion == null || !isCurrentDateInRange(promotion.getStartDate(), promotion.getEndDate())) {
+            return 0; // 프로모션이 없거나 현재 날짜가 프로모션 기간이 아니면 무료 아이템 없음
         }
 
         if (isTwoPlusOnePromotion(promotion)) {
             return product.quantity / 3; // 2+1 프로모션
-        } else if (isOnePlusOnePromotion(promotion)) {
+        }
+        if (isOnePlusOnePromotion(promotion)) {
             return product.quantity / 2; // 1+1 프로모션
         }
 
@@ -154,8 +155,7 @@ public class Products {
         return isPromotionExists(product) &&
                 product.name.equals(purchase.getFirst()) &&
                 Integer.parseInt(purchase.getLast()) >= promotion.getBuy() &&
-                Integer.parseInt(purchase.getLast()) <= product.quantity &&
-                isCurrentDateInRange(promotion.getStartDate(), promotion.getEndDate());
+                Integer.parseInt(purchase.getLast()) <= product.quantity;
     }
 
     // 사용자가 입력한 값에 따라 프로모션 적용 유무를 결정하는 메서드

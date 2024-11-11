@@ -133,12 +133,8 @@ public class Store {
         if (product == null || product.getPromotion().isEmpty()) {
             return 0;
         }
-        Promotions promotion = findPromotionByName(product.getPromotion());
-        if (promotion == null) {
-            return 0;
-        }
         int purchasedQuantity = Integer.parseInt(purchase.getLast());
-        return calculateFreeItems(purchasedQuantity, promotion.getBuy());
+        return Products.calculateFreeItemsForProduct(new Products(product.getName(), product.getPrice(), purchasedQuantity, product.getPromotion()));
     }
 
     // 구매 수량과 프로모션 조건에 따라 무료 아이템 수를 계산하는 메서드
