@@ -160,6 +160,10 @@ public class Products {
 
     // 사용자가 입력한 값에 따라 프로모션 적용 유무를 결정하는 메서드
     private static void processPromotion(Products product, List<String> purchase, Promotions promotion) {
+        if (!isCurrentDateInRange(promotion.getStartDate(), promotion.getEndDate())) {
+            return; // 프로모션 기간이 아니면 처리하지 않음
+        }
+
         int purchaseQuantity = Integer.parseInt(purchase.getLast());
         int freeItems = 0;
         int buyCount = promotion.getBuy();

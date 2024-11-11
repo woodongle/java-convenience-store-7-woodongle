@@ -137,21 +137,6 @@ public class Store {
         return Products.calculateFreeItemsForProduct(new Products(product.getName(), product.getPrice(), purchasedQuantity, product.getPromotion()));
     }
 
-    // 구매 수량과 프로모션 조건에 따라 무료 아이템 수를 계산하는 메서드
-    private int calculateFreeItems(int purchaseQuantity, int buyCount) {
-        return purchaseQuantity / (buyCount + 1);
-    }
-
-    // 구매할 상품의 프로모션을 찾는 메서드
-    private Promotions findPromotionByName(String name) {
-        for (Promotions promotion : promotions) {
-            if (promotion.getName().equals(name)) {
-                return promotion;
-            }
-        }
-        return null;
-    }
-
     // 구매한 상품에 프로모션을 적용하는 프로세스
     private void applyPromotionsProcess() {
         try {
