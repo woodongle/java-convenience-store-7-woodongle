@@ -67,7 +67,7 @@ public class Store {
         int totalQuantity = calculateTotalQuantity(purchasedProducts);
 
         // 구매 요약 출력
-        printPurchaseSummary(totalQuantity, purchasedProducts, freeItemCount, totalPurchaseAmount, promotionDiscountAmount, membershipDiscountAmount, finalAmount);
+        printReceipt(totalQuantity, purchasedProducts, freeItemCount, totalPurchaseAmount, promotionDiscountAmount, membershipDiscountAmount, finalAmount);
     }
 
     private boolean askForMembershipDiscount() {

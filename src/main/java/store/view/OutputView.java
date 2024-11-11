@@ -20,7 +20,7 @@ public class OutputView {
     }
 
     // 구매 내역을 출력하는 메서드
-    public static void printPurchaseSummary(int totalQuantity, List<Products> purchasedProducts, int freeItemCount, int totalPurchaseAmount, int promotionDiscountAmount, int membershipDiscountAmount, int finalAmount) {
+    public static void printReceipt(int totalQuantity, List<Products> purchasedProducts, int freeItemCount, int totalPurchaseAmount, int promotionDiscountAmount, int membershipDiscountAmount, int finalAmount) {
         System.out.println("==============W 편의점================");
         System.out.println("상품명\t\t수량\t금액");
 
