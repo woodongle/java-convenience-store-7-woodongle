@@ -32,6 +32,7 @@ public class Store {
     private void initializeStore() throws IOException {
         loadProducts(stock);
         loadPromotions(promotions);
+        setPromotions(promotions);
         printStoreOpenMessage();
         printProducts(stock);
     }
@@ -48,9 +49,13 @@ public class Store {
     private void calculateAndDisplayFinalAmount() {
         List<Products> purchasedProducts = getPurchasedProducts();
         int freeItemCount = calculateTotalFreeItems();
-        int finalAmount = calculateFinalAmount(purchasedProducts, freeItemCount);
-        System.out.println(finalAmount);
+
+        // 최종 결제 금액 계산
+        int finalAmount = Products.calculateFinalAmount(purchasedProducts, freeItemCount);
+
+        System.out.println("최종 결제 금액: " + finalAmount + "원");
     }
+
 
     // 구매한 상품 목록을 생성하는 메서드
     private List<Products> getPurchasedProducts() {

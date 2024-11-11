@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Products {
+    private static final double MEMBERSHIP_DISCOUNT_RATE = 0.3;
+    private static List<Promotions> promotions = new ArrayList<>();
+
     private String name;
     private int price;
     private int quantity;
@@ -27,6 +30,10 @@ public class Products {
 
     public String getPromotion() {
         return promotion;
+    }
+
+    public static void setPromotions(List<Promotions> promos) {
+        promotions = new ArrayList<>(promos);
     }
 
     public String getName() {
@@ -51,8 +58,9 @@ public class Products {
     public static int calculateFinalAmount(List<Products> purchasedProducts, int freeItemCount) {
         int totalPurchaseAmount = calculateTotalPurchaseAmount(purchasedProducts);
         int promotionDiscountAmount = calculatePromotionDiscountAmount(purchasedProducts, freeItemCount);
+        int membershipDiscountAmount = calculateMembershipDiscountAmount(purchasedProducts, promotionDiscountAmount);
 
-        return totalPurchaseAmount - promotionDiscountAmount;
+        return totalPurchaseAmount - promotionDiscountAmount - membershipDiscountAmount;
     }
 
     private static int calculateTotalPurchaseAmount(List<Products> purchasedProducts) {
@@ -69,10 +77,60 @@ public class Products {
 
         for (Products product : purchasedProducts) {
             if (!product.promotion.isEmpty()) {
-                promotionDiscountAmount += product.price * freeItemCount;
+                // 무료 증정 받은 상품 가격 * 무료 증정 받은 상품 개수
+                int freeItems = calculateFreeItemsForProduct(product);
+                promotionDiscountAmount += product.price * freeItems;
             }
         }
         return promotionDiscountAmount;
+    }
+
+    private static int calculateFreeItemsForProduct(Products product) {
+        Promotions promotion = findPromotionByName(product.promotion);
+        if (promotion == null) {
+            return 0; // 프로모션이 없으면 무료 아이템 없음
+        }
+
+        if (isTwoPlusOnePromotion(promotion)) {
+            return product.quantity / 3; // 2+1 프로모션
+        } else if (isOnePlusOnePromotion(promotion)) {
+            return product.quantity / 2; // 1+1 프로모션
+        }
+
+        return 0; // 다른 프로모션은 없음
+    }
+
+    private static int calculateMembershipDiscountAmount(List<Products> purchasedProducts, int promotionDiscountAmount) {
+        int totalPurchaseAmount = calculateTotalPurchaseAmount(purchasedProducts);
+
+        // 프로모션이 적용되지 않은 총 구매액
+        int nonPromotionTotal = totalPurchaseAmount - promotionDiscountAmount;
+
+        // 사용자에게 멤버십 할인 여부를 묻기
+        String userInput = confirmYOrN(readMembershipYOrN());
+
+        if (userInput.equalsIgnoreCase("Y")) {
+            return (int)(nonPromotionTotal * MEMBERSHIP_DISCOUNT_RATE); // 멤버십 할인 적용
+        }
+
+        return 0; // 멤버십 할인이 적용되지 않음
+    }
+
+    private static boolean isTwoPlusOnePromotion(Promotions promotion) {
+        return promotion.getBuy() == 2 && promotion.getGet() == 1;
+    }
+
+    private static boolean isOnePlusOnePromotion(Promotions promotion) {
+        return promotion.getBuy() == 1 && promotion.getGet() == 1;
+    }
+
+    private static Promotions findPromotionByName(String name) {
+        for (Promotions promotion : promotions) {
+            if (promotion.getName().equals(name)) {
+                return promotion;
+            }
+        }
+        return null; // 프로모션을 찾지 못한 경우
     }
 
     // 프로모션을 적용하는 메서드
